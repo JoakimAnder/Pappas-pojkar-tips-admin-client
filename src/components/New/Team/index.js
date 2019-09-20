@@ -12,7 +12,7 @@ const NewTeam = props => {
         })
     }
     return (
-        <form onSubmit={onSubmit}>
+        <div>
             <input
                 value={team.name}
                 onChange={e => setTeam({...team, name: e.target.value})}
@@ -23,8 +23,8 @@ const NewTeam = props => {
                 onChange={e => setTeam({...team, flag: e.target.value})}
                 placeholder={"flag"}
                 type={"text"} />
-            <button type={"submit"} >Commit</button>
-        </form>
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 

@@ -12,7 +12,7 @@ const NewMatch = props => {
         })
     }
     return (
-        <form onSubmit={onSubmit}>
+        <div>
             <input
                 defaultValue={match.team1}
                 onChange={e => setMatch({...match, team1: e.target.value})}
@@ -53,8 +53,8 @@ const NewMatch = props => {
                 placeholder={"pointsCode"}
                 type={"text"}
             />
-            <button type={"submit"} >Commit</button>
-        </form>
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 

@@ -11,7 +11,7 @@ const NewQuiz = props => {
         })
     }
     return (
-        <form onSubmit={onSubmit}>
+        <div>
             <input
                 value={quiz.name}
                 placeholder={"name"}
@@ -24,8 +24,8 @@ const NewQuiz = props => {
                 type={"number"}
                 onChange={e => setQuiz({...quiz, game: e.target.value})}
             />
-            <button type={"submit"} >Commit</button>
-        </form>
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 

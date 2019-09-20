@@ -3,8 +3,11 @@ import {createQuestion} from "../../Dao";
 
 const NewQuestion = props => {
     const [question, setQuestion] = useState({alternatives:[]});
+    const [alt, setAlt] = useState("");
+
     function onSubmit(e) {
         e.preventDefault();
+        console.log("submited")
 
         createQuestion(question, question => {
             props.select({
@@ -14,17 +17,20 @@ const NewQuestion = props => {
         })
     }
     function addAlt(){
-        let input = document.getElementById("addAltInput");
-        setQuestion({...question, alternatives: [...question.alternatives, input.value]})
-        input.value = "";
+        console.log("addAlt")
+        setQuestion({...question, alternatives: [...question.alternatives, alt]})
+        setAlt("")
     }
     return (
-        <form onSubmit={onSubmit}>
+        <div>
             <input
-                value={question.slogan}
-                onChange={e => setQuestion({...question, slogan: e.target.value})}
+                name={"slogan"}
+                defaultValue={question.slogan}
+                onChange={e => {e.preventDefault(); setQuestion({...question, slogan: e.target.value})}}
                 placeholder={"slogan"}
                 type={"text"} />
+
+                {/*Alternatives*/}
             {question.alternatives && question.alternatives.map((a,i) =>
                 <div key={i}>
                     {a}
@@ -34,22 +40,30 @@ const NewQuestion = props => {
                 </div>
             )}
             <input
-                id={"addAltInput"}
+                name="alt"
+                value={alt}
                 placeholder={"Add alternative"}
+                onKeyPress={e => e.charCode === 13 && addAlt()}
+                onChange={e => {e.preventDefault(); setAlt(e.target.value)}}
             />
             <button onClick={addAlt}>+</button>
+            {/* End Alternatives*/}
+
             <input
-                value={question.pointsCode}
+                name={"pointsCode"}
+                defaultValue={question.pointsCode}
                 placeholder={"pointsCode"}
-                onChange={e => setQuestion({...question, pointsCode: e.target.value})}
+                onChange={e => {e.preventDefault(); setQuestion({...question, pointsCode: e.target.value})}}
                 type={"text"} />
             <input
-                value={question.answerType}
+                name={"answerType"}
+                defaultValue={question.answerType}
                 placeholder={"answerType"}
-                onChange={e => setQuestion({...question, answerType: e.target.value})}
+                onChange={e => {e.preventDefault(); setQuestion({...question, answerType: e.target.value})}}
                 type={"text"} />
-            <button type={"submit"} >Commit</button>
-        </form>
+            <button onClick={onSubmit}>Commit</button>
+
+        </div>
     );
 };
 

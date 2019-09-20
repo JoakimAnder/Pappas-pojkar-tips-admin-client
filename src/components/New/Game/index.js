@@ -14,7 +14,7 @@ const NewGame = props => {
         })
     }
     return (
-        <form onSubmit={onSubmit}>
+        <div>
             <input
                 name={"name"}
                 placeholder={"name"}
@@ -28,8 +28,8 @@ const NewGame = props => {
                 onChange={e => setGame({...game, timeLockedDown: e.target.value})}
                 type={"number"}
             />
-            <button type={"submit"} >Commit</button>
-        </form>
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 
