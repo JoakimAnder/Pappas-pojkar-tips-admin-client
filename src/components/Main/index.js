@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import MyForm from "../MyForm"
 import TabbableList from "../TabbableList"
 
@@ -48,23 +48,49 @@ const quiz = {
 question.quiz = quiz;
 game.quizes.push(quiz);
 
+const lists = {
+    game: [game,game,game,game,game,game,game],
+    quiz: [quiz,quiz,quiz,quiz,quiz,quiz,quiz],
+    match: [match,match,match,match,match,match,match],
+    question: [question,question,question,question,question,question],
+    team: [team1,team2,team1,team2,team1,team2,team1]
+}
+
+
+const reducer = (state, action) => {
+    switch(action.type) {
+        case "SET_TYPE": return {...state, type: action.payload};
+        case "SET_TAB": return {...state, tab: action.payload};
+        case "SET_OBJECT": return {...state, object: action.payload};
+        case "SELECT_OBJECT": return {...state, object: action.payload.object, tab: action.payload.tab};
+        case "SET_ALL": return {...state, ...action.payload};
+        default: return state;
+    }
+}
+
+export const ListContext = React.createContext();
+export const StateContext = React.createContext();
 
 export default function Main() {
-    const [selected, select] = useState({
+    const [selected, dispatch] = useReducer(reducer, {
         type: "new",
-        tab: "question",
-        object: null
+        tab: "team",
+        object: quiz
     })
 
+
+
     return <div>
-        <TabbableList
-            selected={selected}
-            select={s => select({...selected, ...s})}
-        />
-        <hr/>
-        <MyForm
-            selected={selected}
-            select={s => select({...selected, ...s})}
-        />
+        <StateContext.Provider value={{selected, dispatch}}>
+        <ListContext.Provider value={lists}>
+            <TabbableList
+                selected={selected}
+            />
+            <hr/>
+            <MyForm
+                selected={selected}
+            />
+        </ListContext.Provider>
+        </StateContext.Provider>
     </div>
 }

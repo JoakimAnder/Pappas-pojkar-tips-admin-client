@@ -1,42 +1,51 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {StateContext} from "../../Main";
+import useInput from "../../../hooks/useInput";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
 
 const EditMatch = props => {
-    const match = props.selected.object;
+    const {selected, dispatch} = useContext(StateContext);
+    const match = selected.object;
+
+    const [channel, channelBond] = useInput(match.channel);
+    const [[date, time], [dateBond, timeBond], stringDate, epoch] = useDateTimeInput(match["date_time"])
+
     return (
         <div>
             <div>
-                <p style={{display: "inline-block"}}>ID:</p>
-                <input
-                    disabled={true}
-                    value={match.id}
-                />
+                <label>ID:</label>
+                <input disabled={true} value={match.id}/>
             </div>
             <div>
-                <p style={{display: "inline-block"}}>channel:</p>
-                <input
-                    value={match.channel}
-                />
+                <label>channel:</label>
+                <input {...channelBond} />
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>date_time:</p>
-                <input
-                    value={match["date_time"]}
-                />
+                <label>date</label>
+                <input {...dateBond} />
+                <label>time</label>
+                <input {...timeBond} />
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>question:</p>
-                <button onClick={() => props.select({...props.selected, object: match.question, tab: "question"})}>
+                <label>question:</label>
+                <button onClick={() => dispatch({type: "SELECT_OBJECT", payload:{object: match.question, tab: "question"}})}>
                     {`${match.question.id}. ${match.question.slogan}`}
                 </button>
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>teams:</p>
-                {match.teams.map((t,i) => <button key={i}>{`${t.id}. ${t.name}`}</button>)}
+                <label>teams:</label>
+                {match.teams.map((t,i) =>
+                    <button
+                        key={i}
+                        onClick={() => dispatch({type: "SELECT_OBJECT", payload:{object: t, tab: "team"}})}
+                    >
+                        {`${t.id}. ${t.name}`}
+                    </button>
+                )}
             </div>
-
         </div>
     );
 };

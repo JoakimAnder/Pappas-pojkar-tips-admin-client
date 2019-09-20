@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import {createTeam} from "../../Dao";
+import useInput from "../../../hooks/useInput";
 
 const NewTeam = props => {
-    const [team, setTeam] = useState({});
+    const [name, nameBind] = useInput();
+    const [flag, flagBind] = useInput();
 
     function onSubmit(e) {
         e.preventDefault();
+        const team = {
+            name, flag
+        }
 
         createTeam(team, team => {
             props.select({object: team, type: "edit", tab: "team"})
@@ -13,16 +18,14 @@ const NewTeam = props => {
     }
     return (
         <div>
-            <input
-                value={team.name}
-                onChange={e => setTeam({...team, name: e.target.value})}
-                placeholder={"name"}
-                type={"text"} />
-            <input
-                value={team.flag}
-                onChange={e => setTeam({...team, flag: e.target.value})}
-                placeholder={"flag"}
-                type={"text"} />
+            <div>
+                <label>name:</label>
+                <input {...nameBind} placeholder={"name"}/>
+            </div>
+            <div>
+                <label>flag:</label>
+                <input {...flagBind} placeholder={"flag"}/>
+            </div>
             <button onClick={onSubmit}>Commit</button>
         </div>
     );

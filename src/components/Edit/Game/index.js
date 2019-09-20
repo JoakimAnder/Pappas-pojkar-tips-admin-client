@@ -1,12 +1,21 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {StateContext} from "../../Main";
+import useInput from "../../../hooks/useInput";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
 
-const EditGame = (props) => {
-    let game = props.selected.object;
+
+const EditGame = () => {
+    const {selected, dispatch} = useContext(StateContext);
+    let game = selected.object;
+
+    const [name, nameBind] = useInput(game.name);
+    const [[dateLockedDown,timeLockedDown], [dateLockedBind, timeLockedBind], stringLockedDate, lockedEpoch] = useDateTimeInput(game.timeLockedDown);
+    const [[dateEnded,timeEnded], [dateEndedBind, timeEndedBind], stringEndedDate, endedEpoch] = useDateTimeInput(game.timeEnded);
+
     return (
         <div>
-
             <div>
-                <p style={{display: "inline-block"}}>ID:</p>
+                <label>ID:</label>
                 <input
                     disabled={true}
                     value={game.id}
@@ -14,40 +23,41 @@ const EditGame = (props) => {
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>Name:</p>
-                <input
-                    defaultValue={game.name}
-                />
+                <label>Name:</label>
+                <input {...nameBind}/>
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>timeStarted:</p>
-                <input
-                    disabled={true}
-                    value={game.timeStarted}
-                />
+                <label>timeStarted:</label>
+                <input disabled={true} value={game.timeStarted} />
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>TimeLockedDown:</p>
-                <input
-                    defaultValue={game.timeLockedDown}
-                />
+                <label>timeLockedDown:</label>
+                <div>
+                    <label>date:</label>
+                    <input {...dateLockedBind}/>
+                    <label>time:</label>
+                    <input {...timeLockedBind}/>
+                </div>
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>timeEnded:</p>
-                <input
-                    defaultValue={game.timeEnded}
-                />
+                <label>timeEnded:</label>
+                <div>
+                    <label>date:</label>
+                    <input {...dateEndedBind}/>
+                    <label>time:</label>
+                    <input {...timeEndedBind}/>
+                </div>
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>Quizes:</p>
+                <label>Quizes:</label>
                 {game.quizes.map((q, i) =>
                     <button
                         key={i}
-                        onClick={() => props.select({...props.selected, object: q, tab: "quiz"})}
+                        onClick={() => dispatch({payload: {object: q, tab: "quiz"}, type: "SELECT_OBJECT"})}
                     >
                         {`${q.id}. ${q.name}`}
                     </button>

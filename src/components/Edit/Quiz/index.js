@@ -1,35 +1,42 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {StateContext} from "../../Main";
+import useInput from "../../../hooks/useInput";
 
 const EditQuiz = props => {
-    const quiz = props.selected.object;
+    const {selected, dispatch} = useContext(StateContext);
+    const quiz = selected.object;
+
+    const [name, nameBond] = useInput(quiz.name);
+
     return (
         <div>
 
             <div>
-                <p style={{display: "inline-block"}}>ID:</p>
+                <label>ID:</label>
                 <input
+                    disabled={true}
                     value={quiz.id}
                 />
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>name:</p>
-                <input
-                    value={quiz.name}
-                />
+                <label>name:</label>
+                <input {...nameBond} />
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>questions:</p>
+                <label>questions:</label>
                 {quiz.questions.map((q,i) =>
-                    <button key={i} onClick={() => props.select({...props.selected, tab: "question", object: q})}>
+                    <button
+                        key={i}
+                        onClick={() => dispatch({type: "SELECT_OBJECT",payload: {tab: "question", object: q}})}>
                         {`${q.id}. ${q.slogan}`}
                     </button>)}
             </div>
 
             <div>
-                <p style={{display: "inline-block"}}>game:</p>
-                <button onClick={() => props.select({...props.selected, tab: "game", object: quiz.game})}>
+                <label>game:</label>
+                <button onClick={() => dispatch({type: "SELECT_OBJECT",payload: {tab: "question", object: quiz.game}})}>
                     {`${quiz.game.id}. ${quiz.game.name}`}
                 </button>
             </div>
