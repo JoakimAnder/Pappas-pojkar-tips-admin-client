@@ -1,49 +1,46 @@
 import React, {useContext, useState} from 'react';
-import {StateContext, ListContext} from "../../Main";
+import {StateContext, ListContext, ActionContext} from "../../Main";
 import useInput from "../../../hooks/useInput";
 import SearchableList from "../../SearchableList";
+import InputField from "../../InputField";
+import InputAddableList from "../../InputAddableList";
 
 const EditQuestion = props => {
     const {selected, dispatch} = useContext(StateContext);
-    const lists = useContext(ListContext);
+    const [{quizes}] = useContext(ListContext);
+    const {editQuestion} = useContext(ActionContext);
     const question = selected.object;
 
     const [slogan, sloganBond] = useInput(question.slogan);
     const [pointsCode, pointsCodeBond] = useInput(question.pointsCode);
     const [answerType, answerTypeBond] = useInput(question.answerType);
     const [alternatives, setAlts] = useState(question.alternatives);
-    const [alternative, altBond, altReset] = useInput();
     const [results, setResults] = useState(question.results);
-    const [result, resultBond, resultReset] = useInput();
-    const [quiz, setQuiz] = useState(question.quiz)
+    const [quiz, setQuiz] = useState(quizes.find(quiz => quiz.questions.some(q => q.id === question.id)));
+
+
+
+
+    function commit() {
+        console.log(question)
+        const newQuestion = {
+            id: question.id,
+            slogan, pointsCode, answerType, alternatives, results, quiz
+        }
+        // editQuestion(newQuestion)
+    }
 
 
     return (
         <div>
-            <div>
-                <label>ID:</label>
-                <input disabled={true} value={question.id}/>
-            </div>
-
-            <div>
-                <label>slogan:</label>
-                <input {...sloganBond}/>
-            </div>
-
-            <div>
-                <label>pointsCode:</label>
-                <input {...pointsCodeBond} />
-            </div>
-
-            <div>
-                <label>answerType:</label>
-                <input {...answerTypeBond} />
-            </div>
-
+            <InputField label={"ID"} value={question.id} />
+            <InputField label={"slogan"} bond={sloganBond} />
+            <InputField label={"pointsCode"} bond={pointsCodeBond} />
+            <InputField label={"answerType"} bond={answerTypeBond} />
             <div>
                 <label>quiz:</label>
                 <SearchableList
-                    list={lists.quiz}
+                    list={quizes}
                     mapping={(q, i) =>
                         <button
                             key={i}
@@ -61,45 +58,11 @@ const EditQuestion = props => {
                 />
             </div>
 
-            <div>
-                <label>alternatives:</label>
-                {alternatives.map((a,i) =>
-                    <div key={i}>
-                        {a}
-                        <button onClick={() => setAlts(alternatives.filter((_, i1) => i !== i1))}>
-                            X
-                        </button>
-                    </div>
-                )}
-                <input
-                    {...altBond}
-                    placeholder={"Add alternative"}
-                    onKeyPress={e => e.charCode === 13 && setAlts([...alternatives, altReset()])}
-                />
-                <button onClick={() => {
-                    setAlts([...alternatives, altReset()])
-                }}>+</button>
-            </div>
 
-            <div>
-                <label>results:</label>
-                {results.map((a,i) =>
-                    <div key={i}>
-                        {a}
-                        <button onClick={() => setResults(results.filter((_, i1) => i !== i1))}>
-                            X
-                        </button>
-                    </div>
-                )}
-                <input
-                    {...resultBond}
-                    placeholder={"Add result"}
-                    onKeyPress={e => e.charCode === 13 && setResults([...results, resultReset()])}
-                />
-                <button onClick={() => {
-                    setResults([...results, resultReset()])
-                }}>+</button>
-            </div>
+            <InputAddableList list={alternatives} setList={setAlts} placeholder="Add Alternative" label="Alternatives" />
+            <InputAddableList list={results} setList={setResults} placeholder="Add Result" label="Results" />
+
+            <button onClick={commit}>commit</button>
         </div>
     );
 };

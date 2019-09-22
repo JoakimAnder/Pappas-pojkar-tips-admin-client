@@ -1,34 +1,30 @@
 import React, { useState, useContext } from 'react';
-import {createQuiz} from "../../Dao";
-import {ListContext} from "../../Main";
+import {ActionContext, ListContext} from "../../Main";
 import SearchableList from "../../SearchableList";
 import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
 
-const NewQuiz = props => {
-    const lists = useContext(ListContext);
+const NewQuiz = () => {
+    const [{games}] = useContext(ListContext);
+    const {createQuiz} = useContext(ActionContext);
     const [name, nameBond] = useInput();
     const [game, setGame] = useState({});
 
-    function onSubmit(e) {
-        e.preventDefault();
+    function onSubmit() {
         const quiz = {
             name, game
         }
 
-        createQuiz(quiz, quiz => {
-            props.select({object: quiz, type: "edit", tab: "quiz"})
-        })
+        createQuiz(quiz)
     }
     return (
         <div>
-            <div>
-                <label>name:</label>
-                <input {...nameBond} placeholder={"name"}/>
-            </div>
+            <InputField label={"Name"} bond={nameBond} />
+
             <div>
                 <label>game:</label>
                 <SearchableList
-                    list={lists.game}
+                    list={games}
                     mapping={(item, index) =>
                         <button
                             key={index}

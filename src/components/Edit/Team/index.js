@@ -1,35 +1,38 @@
 import React, {useContext, useState} from 'react';
-import {ListContext, StateContext} from "../../Main";
+import {ActionContext, ListContext, StateContext} from "../../Main";
 import useInput from "../../../hooks/useInput";
 import SearchableList from "../../SearchableList";
+import InputField from "../../InputField";
 
 const EditTeam = props => {
     const {selected} = useContext(StateContext);
-    const lists = useContext(ListContext);
+    const {editTeam} = useContext(ActionContext);
+    const [{teams}] = useContext(ListContext);
     const team = selected.object;
-    const [name, nameBind] = useInput(team.name);
-    const [flag, flagBind] = useInput(team.flag);
+
+    const [name, nameBond] = useInput(team.name);
+    const [flag, flagBond] = useInput(team.flag);
     const [refTeam, setRef] = useState(team.refTeam);
 
 
+    function commit() {
+        console.log(team)
+        const newTeam = {
+            id: team.id,
+            name, flag, refTeam
+        }
+        // editTeam(newTeam)
+    }
+
     return (
         <div>
-            <div>
-                <label>ID:</label>
-                <input disabled={true} value={team.id}/>
-            </div>
-            <div>
-                <label>name:</label>
-                <input {...nameBind}/>
-            </div>
-            <div>
-                <label>flag:</label>
-                <input {...flagBind}/>
-            </div>
+            <InputField label={"ID"} value={team.id} />
+            <InputField label={"Name"} bond={nameBond} />
+            <InputField label={"Flag"} bond={flagBond} />
             <div>
                 <label>refTeam:</label>
                 <SearchableList
-                    list={lists.team.filter(t => t.id !== team.id)}
+                    list={teams.filter(t => t.id !== team.id)}
                     mapping={(t, i) =>
                         <button
                             key={i}
@@ -40,6 +43,7 @@ const EditTeam = props => {
                         </button>}
                 />
             </div>
+            <button onClick={commit}>commit</button>
         </div>
     );
 };

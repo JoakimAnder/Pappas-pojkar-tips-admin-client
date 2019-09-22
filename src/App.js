@@ -4,7 +4,7 @@ import Login from "./components/Login";
 
 
 function App() {
-  const [page, setPage] = useState("main");
+  const [page, setPage] = useState("");
   function parsePage() {
     switch (page) {
       case "main":

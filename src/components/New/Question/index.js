@@ -1,63 +1,59 @@
-import React, { useState } from 'react';
-import {createQuestion} from "../../Dao";
+import React, { useState, useContext } from 'react';
 import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import {ActionContext, ListContext} from "../../Main";
+import SearchableList from "../../SearchableList";
+import InputAddableList from "../../InputAddableList";
 
 const NewQuestion = props => {
-    const [question, setQuestion] = useState({alternatives:[]});
-    const [alt, setAlt] = useState("");
-    const [slogan, sloganBind] = useInput();
-    const [pointsCode, pointsCodeBind] = useInput();
-    const [answerType, answerTypeBind] = useInput();
+    const {createQuestion} = useContext(ActionContext);
+    const [{quizes}] = useContext(ListContext);
 
-    function onSubmit(e) {
-        e.preventDefault();
+    const [slogan, sloganBond] = useInput();
+    const [alternatives, setAlts] = useState([]);
+    const [results, setResults] = useState([]);
+    const [quiz, setQuiz] = useState({});
+    const [pointsCode, pointsCodeBond] = useInput();
+    const [answerType, answerTypeBond] = useInput();
 
-        createQuestion(question, question => {
-            props.select({
-                object: question,
-                type: "edit",
-                tab: "question"})
-        })
-    }
-    function addAlt(){
-        setQuestion({...question, alternatives: [...question.alternatives, alt]})
-        setAlt("")
+    function onSubmit() {
+        const question = {
+            results,
+            quiz,
+            slogan,
+            pointsCode,
+            answerType,
+            alternatives
+        };
+
+        createQuestion(question)
     }
     return (
         <div>
-            <div>
-                <label>slogan:</label>
-                <input {...sloganBind} placeholder={"slogan"} />
-            </div>
+            <InputField label={"Slogan"} bond={sloganBond} />
+
+            <InputAddableList list={alternatives} setList={setAlts} placeholder="Add Alternative" label="Alternatives" />
+            <InputAddableList list={results} setList={setResults} placeholder="Add Result" label="Results" />
 
             <div>
-                <label>alternatives:</label>
-                {question.alternatives && question.alternatives.map((a,i) =>
-                    <div key={i}>
-                        {a}
-                        <button onClick={() => setQuestion({...question, alternatives: question.alternatives.filter((_, i1) => i !== i1)})}>
-                            X
-                        </button>
-                    </div>
-                )}
-                <input
-                    name="alt"
-                    value={alt}
-                    placeholder={"Add alternative"}
-                    onKeyPress={e => e.charCode === 13 && addAlt()}
-                    onChange={e => {e.preventDefault(); setAlt(e.target.value)}}
+                <label>quiz:</label>
+                <SearchableList
+                    list={quizes}
+                    mapping={(item, index) =>
+                        <button
+                            key={index}
+                            onClick={() => {
+                                setQuiz(item)
+                            }}
+                            className={(item.id === quiz.id ? "selected" : "")}
+                        >
+                            {`${item.id}. ${item.name}`}
+                        </button>}
                 />
-                <button onClick={addAlt}>+</button>
             </div>
 
-            <div>
-                <label>pointsCode:</label>
-                <input {...pointsCodeBind} placeholder={"pointsCode"}/>
-            </div>
-            <div>
-                <label>answerType:</label>
-                <input {...answerTypeBind} placeholder={"answerType"} />
-            </div>
+            <InputField label={"PointsCode"} bond={pointsCodeBond} />
+            <InputField label={"AnswerType"} bond={answerTypeBond} />
 
             <button onClick={onSubmit}>Commit</button>
 

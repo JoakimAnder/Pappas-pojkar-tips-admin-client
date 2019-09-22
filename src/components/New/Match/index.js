@@ -1,118 +1,65 @@
-import React, { useState, useContext, useEffect } from 'react';
-import {createMatch} from "../../Dao";
-import {ListContext} from "../../Main";
+import React, { useState, useContext } from 'react';
+import {ActionContext, ListContext} from "../../Main";
 import SearchableList from "../../SearchableList";
 import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
+import InputDateField from "../../InputDateField";
 
 const NewMatch = props => {
-    const len2 = x => {
-        x = x+"";
-        return (x.length < 2 ? "0"+x : x);
-    }
-    const lists = useContext(ListContext);
+    const [{quizes, teams}] = useContext(ListContext);
+    const {createMatch} = useContext(ActionContext);
 
-    const now = new Date();
-    const y = now.getFullYear();
-    const mo = now.getMonth()+1;
-    const d = now.getDate();
-    const h = now.getHours();
-    const mi = now.getMinutes();
-
-    const [date, dateBind] = useInput(`${len2(y)}-${len2(mo)}-${len2(d)}`);
-    const [time, timeBind] = useInput(`${len2(h)}:${len2(mi)}`);
-    const [pointsCode, pointsCodeBind] = useInput();
-    const [channel, channelBind] = useInput();
-    const [isTieable, isTieableBind] = useInput();
-    const [teams, setTeams] = useState([{},{}]);
+    const [name, nameBond] = useInput();
+    const [_, [dateBind, timeBind], stringDate] = useDateTimeInput(new Date());
+    const [pointsCode, pointsCodeBond] = useInput();
+    const [channel, channelBond] = useInput();
+    const [isTieable, setTie] = useState(true);
+    const [matchTeams, setTeams] = useState([null, null]);
     const [quiz, setQuiz] = useState({});
 
-    function onSubmit(e) {
-        e.preventDefault();
+    function onSubmit() {
         const match = {
-            date, time, pointsCode, channel, isTieable, teams
-        }
+            "date_time":stringDate(), name, quiz, pointsCode, channel, isTieable, teams: matchTeams
+        };
 
-        createMatch(match, match => {
-            props.select({object: match, tab: "match", type:"edit"})
-        })
+        createMatch(match)
     }
 
-    function customSearchableList(isSecond) {
-        let thisIndex = Number(isSecond);
-        let otherIndex = Number(!isSecond);
-        let thisTeam = teams[thisIndex];
-        let otherTeam = teams[otherIndex];
+    const filteredTeams = teams.filter( t => !matchTeams.some( t2 => t2 && t.id === t2.id ) );
 
+    function customSearchableList(teamIndex, onClick) {
+        const team = matchTeams[teamIndex];
         return <div>
-            <label>team {thisIndex+1}:</label>
-            {thisTeam.id && <button
-                onClick={() => {
-                    const newTeams = [...teams];
-                    newTeams[thisIndex] = {};
-                    setTeams(newTeams)
-                }}>{`${thisTeam.id}. ${thisTeam.name}`}</button>}
-            <label>change:</label>
+            <label>Team {teamIndex+1}:</label>
+            {team && <button onClick={() => onClick(null)}>{`${team.id}. ${team.name}`}</button>}
             <SearchableList
-                list={lists.team.filter(t => t.id !== thisTeam.id && t.id !== otherTeam.id)}
-                mapping={(item, index) =>
-                    <button
-                        key={index}
-                        onClick={() => {
-                            const newTeams = [...teams];
-                            newTeams[thisIndex] = item;
-                            setTeams(newTeams)
-                        }}
-                    >
-                        {`${item.id}. ${item.name}`}
-                    </button>}
+                label="change"
+                list={filteredTeams}
+                onClick={onClick}
             />
         </div>
-    };
-
+    }
 
     return (
         <div>
-            {customSearchableList(false)}
-            {customSearchableList(true)}
-            <div>
-                <label>channel:</label>
-                <input {...channelBind} placeholder={"channel"}/>
-            </div>
-            <div>
-                <label>date:</label>
-                <input {...dateBind} type={"date"}/>
-                <label>time:</label>
-                <input {...timeBind} type={"time"}/>
-            </div>
-            <div>
-                <label>quiz:</label>
-                <SearchableList
-                    list={lists.quiz}
-                    mapping={(item, index) =>
-                        <button
-                            key={index}
-                            onClick={() => {
-                                setQuiz(item)
-                            }}
-                            className={(item.id === quiz.id ? "selected" : "")}
-                        >
-                            {`${item.id}. ${item.name}`}
-                        </button>}
-                />
-            </div>
-            <div>
-                <label>isTieable</label>
-                <input
-                    {...isTieableBind}
-                    defaultChecked={isTieable}
-                    placeholder={"isTieable"}
-                    type={"checkbox"}
-                />
-            </div>
-            <div>
-                <label>pointsCode:</label>
-                <input {...pointsCodeBind} placeholder={"pointsCode"}/>
-            </div>
+            <InputField label={"Name"} bond={nameBond} />
+
+            {customSearchableList(0,q => setTeams([ q, matchTeams[1] ] ))}
+            {customSearchableList(1,t => setTeams([ matchTeams[0], t ] ))}
+
+            <InputField label={"Channel"} bond={channelBond} />
+            <InputDateField dateBond={dateBind} timeBond={timeBind} />
+
+            <SearchableList label="Quiz" list={quizes} onClick={q => setQuiz(q)} selected={quiz} />
+
+            <InputField label="Is Tieable" bond={{
+                defaultChecked: isTieable,
+                onChange: e => setTie(e.target.checked),
+                type: "checkbox"
+            }} />
+
+            <InputField label={"PointsCode"} bond={pointsCodeBond} />
             <button onClick={onSubmit}>Commit</button>
         </div>
     );

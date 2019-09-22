@@ -6,24 +6,121 @@ export function validateAdmin( password, onSuccess ) {
     onSuccess()
 }
 
-export function createGame(game, onSuccess) {
-    axios.post(baseURL+"/createGame", game)
+// region Get
+
+export function getAll( onSuccess=e=>e ) {
+    const lists = {};
+    return Promise.all(
+        [
+            getGames(d => lists.games = d),
+            getQuizes(d => lists.quizes = d),
+            getMatches(d => lists.matches = d),
+            getQuestions(d => lists.questions = d),
+            getTeams(d => lists.teams = d)
+        ]
+    )
+        .then(() => onSuccess(lists))
+        .catch(console.log)
+}
+
+export function getGames( onSuccess=e=>e ) {
+    return axios.get(baseURL+"/getGames")
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
 
-export function createMatch(match, onSuccess) {
-
+export function getQuizes( onSuccess=e=>e ) {
+    return axios.get(baseURL+"/getQuizes")
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
 }
 
-export function createQuestion(question, onSuccess) {
-
+export function getMatches( onSuccess=e=>e ) {
+    return axios.get(baseURL+"/getMatches")
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
 }
 
-export function createQuiz(quiz, onSuccess) {
-
+export function getQuestions( onSuccess=e=>e ) {
+    return axios.get(baseURL+"/getQuestions")
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
 }
 
-export function createTeam(team, onSuccess) {
-
+export function getTeams( onSuccess=e=>e ) {
+    return axios.get(baseURL+"/getTeams")
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
 }
+
+// endregion
+
+// region Create
+
+export function createGame(game, onSuccess=e=>e) {
+    return axios.post(baseURL+"/createGame", game)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function createMatch(match, onSuccess=e=>e) {
+    return axios.post(baseURL+`/createMatch?team1=${match.teams[0].id}&team2=${match.teams[1].id}&isTieable=${match.isTieable}&pointsCode=${match.pointsCode}&quizId=${match.quiz.id}`,
+        match
+    )
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function createQuestion(question, onSuccess=e=>e) {
+    return axios.post(baseURL+`/createQuestion?quizId=${question.quiz.id}`, question)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function createQuiz(quiz, onSuccess=e=>e) {
+    return axios.post(baseURL+`/createQuiz?gameId=${quiz.game.id}`, quiz)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function createTeam(team, onSuccess=e=>e) {
+    return axios.post(baseURL+"/createTeam", team)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+// endregion
+
+// region Edit
+
+export function editGame(game, onSuccess=e=>e) {
+    return axios.put(baseURL+"/editGame", game)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function editMatch(match, onSuccess=e=>e) {
+    return axios.put(baseURL+"/editMatch", match)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function editQuestion(question, onSuccess=e=>e) {
+    return axios.put(baseURL+"/editQuestion", question)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function editQuiz(quiz, onSuccess=e=>e) {
+    return axios.put(baseURL+"/editQuiz", quiz)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+export function editTeam(team, onSuccess=e=>e) {
+    return axios.put(baseURL+"/editGame", team)
+        .then(data => onSuccess(data.data))
+        .catch(console.log)
+}
+
+// endregion

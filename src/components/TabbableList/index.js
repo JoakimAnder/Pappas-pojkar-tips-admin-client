@@ -2,17 +2,18 @@ import React, { useContext } from "react";
 import SearchableList from "../SearchableList";
 import {ListContext, StateContext} from "../Main";
 
-const tabs = [
-    "game", "quiz", "question", "match", "team"
-];
+const tabs = {
+    "game":"games", "quiz":"quizes", "question":"questions", "match":"matches", "team":"teams"
+};
 
-export default function TabbableList(props) {
-    const lists = useContext(ListContext);
+
+export default function TabbableList() {
+    const [lists] = useContext(ListContext);
     const {selected, dispatch} = useContext(StateContext);
 
     return <div>
         <div>
-            {tabs.map((t, i) => {
+            {Object.keys(tabs).map((t, i) => {
                 return <span key={i}><button
                     onClick={() => {
                         dispatch({type:"SET_TYPE",payload:"new"});
@@ -28,7 +29,7 @@ export default function TabbableList(props) {
             <button onClick={() => dispatch({type:"SET_TYPE",payload: "new"})} >New</button>
 
             <SearchableList
-                list={lists[selected.tab]}
+                list={lists[tabs[selected.tab]]}
                 filter={(query, item) => {
                     query = query.trim().toLowerCase();
                     if(query.length === 0)
@@ -38,6 +39,8 @@ export default function TabbableList(props) {
                     else {
                         if(selected.tab === "question")
                             return item.slogan.toLowerCase().includes(query);
+                        else if (selected.tab === "match")
+                            return item.question.slogan.toLowerCase().includes(query);
                         else
                             return item.name.toLowerCase().includes(query);
                     }
@@ -50,7 +53,7 @@ export default function TabbableList(props) {
                             dispatch({type:"SET_TYPE", payload: "edit"});
                         }}
                     >
-                        {`${item.id}. ${(selected.tab === "question" ? item.slogan : item.name)}`}
+                        {`${item.id}. ${(selected.tab === "question" ? item.slogan : selected.tab === "match" ? item.question.slogan : item.name)}`}
                     </button>}
             />
 

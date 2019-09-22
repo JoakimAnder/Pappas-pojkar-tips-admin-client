@@ -1,31 +1,24 @@
-import React, { useState } from 'react';
-import {createTeam} from "../../Dao";
+import React, {useContext} from 'react';
 import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import {ActionContext} from "../../Main";
 
-const NewTeam = props => {
+const NewTeam = () => {
+    const {createTeam} = useContext(ActionContext);
     const [name, nameBind] = useInput();
     const [flag, flagBind] = useInput();
 
-    function onSubmit(e) {
-        e.preventDefault();
+    function onSubmit() {
         const team = {
             name, flag
         }
 
-        createTeam(team, team => {
-            props.select({object: team, type: "edit", tab: "team"})
-        })
+        createTeam(team)
     }
     return (
         <div>
-            <div>
-                <label>name:</label>
-                <input {...nameBind} placeholder={"name"}/>
-            </div>
-            <div>
-                <label>flag:</label>
-                <input {...flagBind} placeholder={"flag"}/>
-            </div>
+            <InputField label={"Name"} bond={nameBind} />
+            <InputField label={"Flag"} bond={flagBind} />
             <button onClick={onSubmit}>Commit</button>
         </div>
     );

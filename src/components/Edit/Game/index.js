@@ -1,69 +1,44 @@
 import React, {useContext} from 'react';
-import {StateContext} from "../../Main";
+import {ActionContext, StateContext} from "../../Main";
 import useInput from "../../../hooks/useInput";
 import useDateTimeInput from "../../../hooks/useDateTimeInput";
+import InputField from "../../InputField";
+import InputDateField from "../../InputDateField";
+import InputListField from "../../InputListField";
 
 
 const EditGame = () => {
     const {selected, dispatch} = useContext(StateContext);
+    const {editGame} = useContext(ActionContext);
     let game = selected.object;
 
-    const [name, nameBind] = useInput(game.name);
-    const [[dateLockedDown,timeLockedDown], [dateLockedBind, timeLockedBind], stringLockedDate, lockedEpoch] = useDateTimeInput(game.timeLockedDown);
-    const [[dateEnded,timeEnded], [dateEndedBind, timeEndedBind], stringEndedDate, endedEpoch] = useDateTimeInput(game.timeEnded);
+    const [name, nameBond] = useInput(game.name);
+    const [_, [dateLockedBind, timeLockedBind], stringLockedDate] = useDateTimeInput(game.timeLockedDown);
+    const [__, [dateEndedBind, timeEndedBind], stringEndedDate] = useDateTimeInput(game.timeEnded);
 
+
+    function commit() {
+        console.log(game)
+        const newGame = {
+            id: game.id,
+            name,
+            timeLockedDown: stringLockedDate(),
+            timeEnded: stringEndedDate()
+        };
+        // editGame(newGame)
+    }
     return (
         <div>
-            <div>
-                <label>ID:</label>
-                <input
-                    disabled={true}
-                    value={game.id}
-                />
-            </div>
+            <InputField label={"ID"} value={game.id} />
+            <InputField label={"Name"} bond={nameBond} />
+            <InputField label={"TimeStarted"} value={game.timeStarted} />
 
-            <div>
-                <label>Name:</label>
-                <input {...nameBind}/>
-            </div>
+            <InputDateField label="TimeLockedDown" dateBond={dateLockedBind} timeBond={timeLockedBind} />
+            <InputDateField label="TimeEnded" dateBond={dateEndedBind} timeBond={timeEndedBind} />
 
-            <div>
-                <label>timeStarted:</label>
-                <input disabled={true} value={game.timeStarted} />
-            </div>
+            <InputListField label="Quizes" list={game.quizes} onClick={q => dispatch({payload: {object: q, tab: "quiz"}, type: "SELECT_OBJECT"})} />
 
-            <div>
-                <label>timeLockedDown:</label>
-                <div>
-                    <label>date:</label>
-                    <input {...dateLockedBind}/>
-                    <label>time:</label>
-                    <input {...timeLockedBind}/>
-                </div>
-            </div>
-
-            <div>
-                <label>timeEnded:</label>
-                <div>
-                    <label>date:</label>
-                    <input {...dateEndedBind}/>
-                    <label>time:</label>
-                    <input {...timeEndedBind}/>
-                </div>
-            </div>
-
-            <div>
-                <label>Quizes:</label>
-                {game.quizes.map((q, i) =>
-                    <button
-                        key={i}
-                        onClick={() => dispatch({payload: {object: q, tab: "quiz"}, type: "SELECT_OBJECT"})}
-                    >
-                        {`${q.id}. ${q.name}`}
-                    </button>
-                )}
-            </div>
-
+            <button onClick={commit}>commit</button>
         </div>
     );
 };
