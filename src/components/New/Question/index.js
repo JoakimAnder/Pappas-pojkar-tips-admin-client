@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react';
 import useInput from "../../../hooks/useInput";
 import InputField from "../../InputField";
-import {ActionContext, ListContext} from "../../Main";
 import SearchableList from "../../SearchableList";
 import InputAddableList from "../../InputAddableList";
+import {StateContext} from "../../Main";
+import {createQuestion} from "../../actions";
 
-const NewQuestion = props => {
-    const {createQuestion} = useContext(ActionContext);
-    const [{quizes}] = useContext(ListContext);
+const NewQuestion = () => {
+    const {quizes} = useContext(StateContext);
 
     const [slogan, sloganBond] = useInput();
     const [alternatives, setAlts] = useState([]);
@@ -35,22 +35,12 @@ const NewQuestion = props => {
             <InputAddableList list={alternatives} setList={setAlts} placeholder="Add Alternative" label="Alternatives" />
             <InputAddableList list={results} setList={setResults} placeholder="Add Result" label="Results" />
 
-            <div>
-                <label>quiz:</label>
-                <SearchableList
-                    list={quizes}
-                    mapping={(item, index) =>
-                        <button
-                            key={index}
-                            onClick={() => {
-                                setQuiz(item)
-                            }}
-                            className={(item.id === quiz.id ? "selected" : "")}
-                        >
-                            {`${item.id}. ${item.name}`}
-                        </button>}
-                />
-            </div>
+            <SearchableList
+                label={"Quiz"}
+                list={quizes}
+                onClick={q => setQuiz(q)}
+                selected={quiz}
+            />
 
             <InputField label={"PointsCode"} bond={pointsCodeBond} />
             <InputField label={"AnswerType"} bond={answerTypeBond} />

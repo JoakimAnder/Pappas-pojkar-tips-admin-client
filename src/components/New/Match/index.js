@@ -1,17 +1,17 @@
 import React, { useState, useContext } from 'react';
-import {ActionContext, ListContext} from "../../Main";
 import SearchableList from "../../SearchableList";
 import useInput from "../../../hooks/useInput";
 import InputField from "../../InputField";
 import useDateTimeInput from "../../../hooks/useDateTimeInput";
 import InputDateField from "../../InputDateField";
+import {StateContext} from "../../Main";
+import {createMatch} from "../../actions";
 
 const NewMatch = props => {
-    const [{quizes, teams}] = useContext(ListContext);
-    const {createMatch} = useContext(ActionContext);
+    const {quizes, teams} = useContext(StateContext);
 
     const [name, nameBond] = useInput();
-    const [_, [dateBind, timeBind], stringDate] = useDateTimeInput(new Date());
+    const [, [dateBind, timeBind], stringDate] = useDateTimeInput(new Date());
     const [pointsCode, pointsCodeBond] = useInput();
     const [channel, channelBond] = useInput();
     const [isTieable, setTie] = useState(true);

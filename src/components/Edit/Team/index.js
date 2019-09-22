@@ -1,48 +1,37 @@
 import React, {useContext, useState} from 'react';
-import {ActionContext, ListContext, StateContext} from "../../Main";
+import {StateContext} from "../../Main";
 import useInput from "../../../hooks/useInput";
 import SearchableList from "../../SearchableList";
 import InputField from "../../InputField";
+import {editTeam} from "../../actions";
 
-const EditTeam = props => {
-    const {selected} = useContext(StateContext);
-    const {editTeam} = useContext(ActionContext);
-    const [{teams}] = useContext(ListContext);
-    const team = selected.object;
+const EditTeam = () => {
+    const {selectedObject, teams} = useContext(StateContext);
 
-    const [name, nameBond] = useInput(team.name);
-    const [flag, flagBond] = useInput(team.flag);
-    const [refTeam, setRef] = useState(team.refTeam);
+    const id = selectedObject.id;
+    const [name, nameBond] = useInput(selectedObject.name);
+    const [flag, flagBond] = useInput(selectedObject.flag);
+    const [refTeam, setRef] = useState(selectedObject.refTeam);
 
 
     function commit() {
-        console.log(team)
         const newTeam = {
-            id: team.id,
-            name, flag, refTeam
+            id, name, flag, refTeam
         }
-        // editTeam(newTeam)
+        editTeam(newTeam)
     }
 
     return (
         <div>
-            <InputField label={"ID"} value={team.id} />
+            <InputField label={"ID"} value={id} />
             <InputField label={"Name"} bond={nameBond} />
             <InputField label={"Flag"} bond={flagBond} />
-            <div>
-                <label>refTeam:</label>
-                <SearchableList
-                    list={teams.filter(t => t.id !== team.id)}
-                    mapping={(t, i) =>
-                        <button
-                            key={i}
-                            className={(refTeam && t.id === refTeam.id ? "selected": "")}
-                            onClick={() => setRef((refTeam && t.id === refTeam.id ? null : t))}
-                        >
-                            {`${t.id}. ${t.name}`}
-                        </button>}
-                />
-            </div>
+            <SearchableList
+                label={"RefTeam"}
+                list={teams.filter(t => t.id !== id)}
+                selected={refTeam}
+                onClick={t => setRef(refTeam && t.id === refTeam.id ? null : t)}
+            />
             <button onClick={commit}>commit</button>
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import useInput from "../../hooks/useInput"
 
 function defaultFilter(query, item) {
@@ -9,20 +9,24 @@ function defaultFilter(query, item) {
     const intQuery = Number.parseInt(query);
     return (
         Number.isNaN(intQuery)
-            ? item.name.toLowerCase().includes(query)
+            ? (item.name && item.name.toLowerCase().includes(query)) || (item.slogan && item.slogan.toLowerCase().includes(query))
             : item.id === intQuery)
 }
 
-export default function SearchableList({label, list=[], selected, onClick, filter=defaultFilter, mapping}) {
+function defaultIsSelected(item, selected) {
+    return item.id === selected.id;
+}
+
+export default function SearchableList({label, list=[], selected, isSelected=defaultIsSelected, onClick, filter=defaultFilter, mapping, buttonLabel, searchable=true}) {
     const [query, queryBond] = useInput();
 
     function defaultMapping(item, index) {
         return <button
             key={index}
             onClick={() => onClick(item, index)}
-            className={(selected && item.id === selected.id ? "selected" : "")}
+            className={(selected && isSelected(item, selected) ? "selected" : "")}
         >
-            {`${item.id}. ${item.name}`}
+            {buttonLabel ? buttonLabel(item, index) : `${item.id}. ${item.name || item.slogan}`}
         </button>
     }
 
@@ -32,9 +36,9 @@ export default function SearchableList({label, list=[], selected, onClick, filte
     return (
         <div>
             {label && <label>{label}:</label>}
-            <div>
+            {searchable && <div>
                 <input {...queryBond} placeholder={"Search"}/>
-            </div>
+            </div>}
             {list}
         </div>
     )

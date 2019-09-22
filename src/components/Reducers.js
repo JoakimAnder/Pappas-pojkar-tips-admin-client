@@ -1,17 +1,24 @@
-
-export function selectReducer(state, action) {
-    switch(action.type) {
-        case "SET_TYPE": return {...state, type: action.payload};
-        case "SET_TAB": return {...state, tab: action.payload};
-        case "SET_OBJECT": return {...state, object: action.payload};
-        case "SELECT_OBJECT": return {...state, object: action.payload.object, tab: action.payload.tab};
-        case "SET_ALL": return {...state, ...action.payload};
-        default: return state;
-    }
+export const tabs = {
+    "game":"games", "quiz":"quizes", "question":"questions", "match":"matches", "team":"teams"
 }
-
-export function listReducer(state, action) {
+export function reducer(state, action) {
     switch(action.type) {
+
+        case "SELECT_TAB":
+            return {...state, selectedTab: action.payload};
+        case "SELECT_OPERATION":
+            return {...state, selectedOperation: action.payload};
+        case "SELECT_OBJECT":
+            state = reducer(state,{type: "SELECT_OPERATION", payload: "edit"});
+            state = reducer(state,{type: "SELECT_TAB", payload: action.payload.tab});
+
+            let selectedObject = action.payload.object;
+            selectedObject = state[tabs[state.selectedTab]].find(o => o.id === selectedObject.id) || selectedObject;
+            return {...state, selectedObject};
+
+
+
+
         case "ADD_TASK": return {...state, tasks: [...state.tasks, action.task], isLoading: true};
         case "REMOVE_TASK":
             const tasks = [...state.tasks.filter(t => t !== action.task)];
@@ -41,10 +48,6 @@ export function listReducer(state, action) {
         case "GET_TEAMS":
             console.log("Got Teams");
             return {...state, teams: action.payload};
-
-        case "SELECT_OBJECT":
-            console.log(state);
-            return state;
 
         default: return state;
     }

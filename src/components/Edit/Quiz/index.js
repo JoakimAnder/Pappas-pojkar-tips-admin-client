@@ -1,65 +1,43 @@
 import React, {useContext, useState} from 'react';
-import {ActionContext, ListContext, StateContext} from "../../Main";
+import {StateContext} from "../../Main";
 import useInput from "../../../hooks/useInput";
 import InputField from "../../InputField";
 import SearchableList from "../../SearchableList";
 import InputListField from "../../InputListField";
+import {editQuiz, setObject} from "../../actions";
 
-const EditQuiz = props => {
-    const {selected, dispatch} = useContext(StateContext);
-    const [{games}] = useContext(ListContext);
-    const {editQuiz} = useContext(ActionContext);
-    const quiz = selected.object;
+const EditQuiz = () => {
+    const {selectedObject, games} = useContext(StateContext);
 
-    const [name, nameBond] = useInput(quiz.name);
-    const [game, setGame] = useState(quiz.game);
-
-    //TODO setGame
-    console.log(quiz)
+    const id = selectedObject.id;
+    const questions = selectedObject.questions;
+    const [name, nameBond] = useInput(selectedObject.name);
+    const [game, setGame] = useState(selectedObject.game);
 
 
     function commit() {
-        console.log(quiz)
         const newQuiz = {
-            id: quiz.id,
-            name, game
+            id, name, game
         }
-        // editQuiz(newQuiz)
+        editQuiz(newQuiz)
     }
 
     return (
         <div>
-
-            <InputField label={"ID"} value={quiz.id} />
+            <InputField label={"ID"} value={id} />
             <InputField label={"Name"} bond={nameBond} />
 
             <InputListField
                 label="Questions"
-                list={quiz.questions}
-                onClick={(q) => dispatch({type: "SELECT_OBJECT",payload: {tab: "question", object: q}})}
-                buttonLabel={(q) => `${q.id}. ${q.slogan}`}
+                list={questions}
+                onClick={q => setObject(q, "question")}
             />
-
-            <div>
-                <label>game:</label>
-                <SearchableList
-                    list={games}
-                    mapping={(g,i) =>
-                        <button
-                            key={i}
-                            className={(g.id === game.id? "selected":"")}
-                            onClick={() => {
-                                if(g.id === game.id)
-                                    dispatch({type: "SELECT_OBJECT",payload: {tab: "game", object: quiz.game}})
-                                else
-                                    setGame(g)
-                            }}
-                        >
-                            {`${g.id}. ${g.name}`}
-                        </button>
-                    }
-                />
-            </div>
+            <SearchableList
+                label="Game"
+                list={games}
+                selected={game}
+                onClick={g => g.id === game.id ? setObject(g, "game") : setGame(g)}
+            />
             <button onClick={commit}>commit</button>
 
         </div>

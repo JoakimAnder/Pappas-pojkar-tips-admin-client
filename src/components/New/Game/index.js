@@ -1,21 +1,20 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import useInput from "../../../hooks/useInput";
-import { ActionContext } from "../../Main";
 import InputField from "../../InputField";
 import useDateTimeInput from "../../../hooks/useDateTimeInput";
 import InputDateField from "../../InputDateField";
+import {createGame} from "../../actions";
 
 
 const NewGame = () => {
-    const {createGame} = useContext(ActionContext);
     const [name, nameBind] = useInput();
-    const [_, [dateBond, timeBond], stringDate] = useDateTimeInput(Date.now());
+    const [, [dateBond, timeBond], stringDate] = useDateTimeInput(Date.now());
 
     function onSubmit() {
         const newGame = {
             name,
             timeLockedDown: stringDate()
-        }
+        };
         createGame(newGame)
     }
 
