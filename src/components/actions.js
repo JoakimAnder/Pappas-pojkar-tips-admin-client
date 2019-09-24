@@ -26,22 +26,56 @@ function APIRequest(process, then=e=>e) {
 // region Create
 
 export function createGame(game) {
+    game = {
+        name: game.name,
+        timeLockedDown: game.timeLockedDown
+    };
     return APIRequest(() => dao.createGame(game), getGames)
 }
 
 export function createQuiz(quiz) {
+    quiz = {
+        name: quiz.name,
+        game: {
+            id: quiz.game.id
+        }
+    };
     return APIRequest(() => dao.createQuiz(quiz), getQuizes)
 }
 
 export function createMatch(match) {
-    return APIRequest(() => dao.createMatch(match), getMatches)
+    const pointsCode = match.pointsCode;
+    const isTieable = match.isTieable;
+    const quizID = match.quiz.id;
+    match = {
+        name: match.name,
+        channel: match.channel,
+        date_time: match.date_time,
+        teams: [
+            {id: match.teams[0].id},
+            {id: match.teams[1].id}
+        ]
+    };
+    return APIRequest(() => dao.createMatch(match, isTieable, pointsCode, quizID), getMatches)
 }
 
 export function createQuestion(question) {
-    return APIRequest(() => dao.createQuestion(question), getQuestions)
+    const quizID = question.quiz.id;
+    question = {
+        slogan: question.slogan,
+        pointsCode: question.pointsCode,
+        answerType: question.answerType,
+        alternatives: question.alternatives,
+        results: question.results,
+    };
+    return APIRequest(() => dao.createQuestion(question, quizID), getQuestions)
 }
 
 export function createTeam(team) {
+    team = {
+        name: team.name,
+        flag: team.flag
+    };
     return APIRequest(() => dao.createTeam(team), getTeams)
 }
 
@@ -78,22 +112,59 @@ export function getTeams() {
 // region Edit
 
 export function editGame(game) {
+    game = {
+        id: game.id,
+        name: game.name,
+        timeLockedDown: game.timeLockedDown,
+        timeEnded: game.timeEnded
+    };
     return APIRequest( () => dao.editGame(game), o => dispatch({type: "GET_GAMES", payload: o}))
 }
 
 export function editQuiz(quiz) {
+    quiz = {
+        id: quiz.id,
+        name: quiz.name,
+        game: {
+            id: quiz.game.id
+        }
+    };
     return APIRequest( () => dao.editQuiz(quiz), o => dispatch({type: "GET_QUIZES", payload: o}))
 }
 
 export function editMatch(match) {
+    match = {
+        id: match.id,
+        name: match.name,
+        channel: match.channel,
+        date_time: match.date_time,
+        teams: [
+            {id: match.teams[0].id},
+            {id: match.teams[1].id}
+        ]
+    };
     return APIRequest( () => dao.editMatch(match), o => dispatch({type: "GET_MATCHES", payload: o}))
 }
 
 export function editQuestion(question) {
-    return APIRequest( () => dao.editQuestion(question), o => dispatch({type: "GET_QUESTIONS", payload: o}))
+    const quizID = question.quiz.id;
+    question = {
+        id: question.id,
+        slogan: question.slogan,
+        answerType: question.answerType,
+        alternatives: question.alternatives,
+        results: question.results,
+    };
+    return APIRequest( () => dao.editQuestion(question, quizID), o => dispatch({type: "GET_QUESTIONS", payload: o}))
 }
 
 export function editTeam(team) {
+    team = {
+        id: team.id,
+        name: team.name,
+        flag: team.flag,
+        refTeam: (team.refTeam ? {id: team.refTeam.id} : null)
+    };
     return APIRequest( () => dao.editTeam(team), o => dispatch({type: "GET_TEAMS", payload: o}))
 }
 

@@ -63,22 +63,21 @@ export function createGame(game, onSuccess=e=>e) {
         .catch(console.log)
 }
 
-export function createMatch(match, onSuccess=e=>e) {
-    return axios.post(baseURL+`/createMatch?team1=${match.teams[0].id}&team2=${match.teams[1].id}&isTieable=${match.isTieable}&pointsCode=${match.pointsCode}&quizId=${match.quiz.id}`,
-        match
+export function createMatch(match, isTieable, pointsCode, quizID, onSuccess=e=>e) {
+    return axios.post(baseURL+`/createMatch?isTieable=${isTieable}&pointsCode=${pointsCode}&quizId=${quizID}`, match
     )
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
 
-export function createQuestion(question, onSuccess=e=>e) {
-    return axios.post(baseURL+`/createQuestion?quizId=${question.quiz.id}`, question)
+export function createQuestion(question, quizID, onSuccess=e=>e) {
+    return axios.post(baseURL+`/createQuestion?quizId=${quizID}`, question)
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
 
 export function createQuiz(quiz, onSuccess=e=>e) {
-    return axios.post(baseURL+`/createQuiz?gameId=${quiz.game.id}`, quiz)
+    return axios.post(baseURL+`/createQuiz?gameId=${quiz.game.id}`, {name: quiz.name})
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
@@ -105,8 +104,8 @@ export function editMatch(match, onSuccess=e=>e) {
         .catch(console.log)
 }
 
-export function editQuestion(question, onSuccess=e=>e) {
-    return axios.put(baseURL+"/editQuestion", question)
+export function editQuestion(question, quizID, onSuccess=e=>e) {
+    return axios.put(baseURL+"/editQuestion?quizID="+quizID, question)
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
