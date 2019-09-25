@@ -1,35 +1,29 @@
-import React, { useState } from 'react';
-import {createGame} from "../../Dao";
+import React from 'react';
+import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
+import InputDateField from "../../InputDateField";
+import {createGame} from "../../actions";
 
-const NewGame = props => {
-    const [game, setGame] = useState({});
-    function onSubmit(e) {
-        e.preventDefault();
 
-        createGame(game, game => {
-            props.select({
-                object: game,
-                tab: "game",
-                type: "edit"});
-        })
+const NewGame = () => {
+    const [name, nameBind] = useInput();
+    const [, [dateBond, timeBond], stringDate] = useDateTimeInput(Date.now());
+
+    function onSubmit() {
+        const newGame = {
+            name,
+            timeLockedDown: stringDate()
+        };
+        createGame(newGame)
     }
+
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                name={"name"}
-                placeholder={"name"}
-                onChange={e => setGame({...game, name: e.target.value})}
-                type={"text"}
-            />
-            <input
-                name={"time"}
-                defaultValue={game.timeLockedDown}
-                placeholder={"time"}
-                onChange={e => setGame({...game, timeLockedDown: e.target.value})}
-                type={"number"}
-            />
-            <button type={"submit"} >Commit</button>
-        </form>
+        <div>
+            <InputField label={"Name"} bond={nameBind} />
+            <InputDateField label="TimeLockedDown" {...{dateBond, timeBond}} />
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 

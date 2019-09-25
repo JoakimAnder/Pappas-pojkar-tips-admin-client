@@ -1,42 +1,66 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
+import {StateContext} from "../../Main";
+import useInput from "../../../hooks/useInput";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
+import InputField from "../../InputField";
+import InputDateField from "../../InputDateField";
+import InputListField from "../../InputListField";
+import {editMatch, setObject} from "../../actions";
+import SearchableList from "../../SearchableList";
 
-const EditMatch = props => {
-    const match = props.selected.object;
+const EditMatch = () => {
+    const {selectedObject, teams} = useContext(StateContext);
+
+    const id = selectedObject.id;
+    const [name, nameBond] = useInput(selectedObject.name);
+    const [channel, channelBond] = useInput(selectedObject.channel);
+    const [, [dateBond, timeBond], stringDate] = useDateTimeInput(selectedObject["date_time"]);
+    const question = selectedObject.question;
+    const [matchTeams, setTeams] = useState(selectedObject.teams);
+
+
+
+    function commit() {
+        const newMatch = {
+            id,
+            name,
+            channel,
+            "date_time": stringDate(),
+            teams: matchTeams
+        };
+        editMatch(newMatch)
+    }
+    const filteredTeams = teams.filter( t => !matchTeams.some( t2 => t2 && t.id === t2.id ) );
+    function customSearchableList(teamIndex, onClick) {
+        const team = matchTeams[teamIndex];
+        return <div>
+            <label>Team {teamIndex+1}:</label>
+            {team && <button onClick={() => onClick(null)}>{`${team.id}. ${team.name}`}</button>}
+            <SearchableList
+                label="change"
+                list={filteredTeams}
+                onClick={onClick}
+            />
+        </div>
+    }
     return (
         <div>
-            <div>
-                <p style={{display: "inline-block"}}>ID:</p>
-                <input
-                    disabled={true}
-                    value={match.id}
-                />
-            </div>
-            <div>
-                <p style={{display: "inline-block"}}>channel:</p>
-                <input
-                    value={match.channel}
-                />
-            </div>
+            <InputField label={"ID"} value={id} />
+            <InputField label={"Name"} bond={nameBond} />
+            <InputField label={"Channel"} bond={channelBond} />
 
-            <div>
-                <p style={{display: "inline-block"}}>date_time:</p>
-                <input
-                    value={match["date_time"]}
-                />
-            </div>
+            <InputDateField dateBond={dateBond} timeBond={timeBond} />
 
-            <div>
-                <p style={{display: "inline-block"}}>question:</p>
-                <button onClick={() => props.select({...props.selected, object: match.question, tab: "question"})}>
-                    {`${match.question.id}. ${match.question.slogan}`}
-                </button>
-            </div>
+            <InputListField
+                label="Question"
+                list={[question]}
+                onClick={q => setObject(q, "question")}
+            />
 
-            <div>
-                <p style={{display: "inline-block"}}>teams:</p>
-                {match.teams.map((t,i) => <button key={i}>{`${t.id}. ${t.name}`}</button>)}
-            </div>
+            {customSearchableList(0,q => setTeams([ q, matchTeams[1] ] ))}
+            {customSearchableList(1,t => setTeams([ matchTeams[0], t ] ))}
 
+            <button onClick={commit}>commit</button>
         </div>
     );
 };

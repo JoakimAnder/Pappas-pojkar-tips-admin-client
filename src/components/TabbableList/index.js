@@ -1,32 +1,38 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
+import SearchableList from "../SearchableList";
+import {StateContext} from "../Main";
+import {tabs} from "../Reducers";
+import {setTab, setObject, setOperation, getAll} from "../actions";
 
-const tabs = [
-    "game", "quiz", "question", "match", "team"
-];
 
-export default function TabbableList(props) {
-    const [ search, setSearch ] = useState("");
+export default function TabbableList() {
+    const state = useContext(StateContext);
+    const selectedTab = state.selectedTab;
 
     return <div>
-        <div>
-            {tabs.map((t, i) => {
-                return <span key={i}><button
-                    onClick={() => props.select({...props.selected, tab: t})}
-                    className={t === props.selected.tab ? "selected": ""}
-                >
-                    {t}
-                </button></span>
-            })}
-        </div>
-        <div>
-            <span>
-                <input onChange={ e => setSearch(e.target.value) } placeholder={"Search"} value={search} />
-                <button onClick={() => props.select({...props.selected, type: "new"})} >New</button>
-            </span>
+        <SearchableList
+            list={Object.keys(tabs)}
+            isSelected={(item, selected) => item === selected}
+            selected={selectedTab}
+            buttonLabel={i => i}
+            searchable={false}
+            onClick={t => {
+                if(t === selectedTab) {
+                    getAll();
+                } else {
+                    setOperation("new");
+                    setTab(t)
+                }
+            }}
+        />
 
+        <button onClick={() => setOperation("new")} >New</button>
 
-        </div>
-
-
+        <SearchableList
+            list={state[tabs[selectedTab]]}
+            onClick={item => setObject(item, selectedTab)}
+            selected={selectedTab}
+            isSelected={(item, selected) => item === selected}
+        />
     </div>
 }

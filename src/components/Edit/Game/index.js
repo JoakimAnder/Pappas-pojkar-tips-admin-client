@@ -1,59 +1,44 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { StateContext } from "../../Main";
+import useInput from "../../../hooks/useInput";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
+import InputField from "../../InputField";
+import InputDateField from "../../InputDateField";
+import InputListField from "../../InputListField";
+import {editGame, setObject} from "../../actions";
 
-const EditGame = (props) => {
-    let game = props.selected.object;
+
+const EditGame = () => {
+    const {selectedObject} = useContext(StateContext);
+
+    const id = selectedObject.id;
+    const quizes = selectedObject.quizes;
+    const timeStarted = selectedObject.timeStarted;
+    const [name, nameBond] = useInput(selectedObject.name);
+    const [, [dateLockedBind, timeLockedBind], stringLockedDate] = useDateTimeInput(selectedObject.timeLockedDown);
+    const [, [dateEndedBind, timeEndedBind], stringEndedDate] = useDateTimeInput(selectedObject.timeEnded);
+
+    function commit() {
+        const newGame = {
+            id,
+            name,
+            timeLockedDown: stringLockedDate(),
+            timeEnded: stringEndedDate()
+        };
+        editGame(newGame)
+    }
     return (
         <div>
+            <InputField label={"ID"} value={id} />
+            <InputField label={"Name"} bond={nameBond} />
+            <InputField label={"TimeStarted"} value={timeStarted} />
 
-            <div>
-                <p style={{display: "inline-block"}}>ID:</p>
-                <input
-                    disabled={true}
-                    value={game.id}
-                />
-            </div>
+            <InputDateField label="TimeLockedDown" dateBond={dateLockedBind} timeBond={timeLockedBind} />
+            <InputDateField label="TimeEnded" dateBond={dateEndedBind} timeBond={timeEndedBind} />
 
-            <div>
-                <p style={{display: "inline-block"}}>Name:</p>
-                <input
-                    defaultValue={game.name}
-                />
-            </div>
+            <InputListField label="Quizes" list={quizes} onClick={q => setObject(q, "quiz")} />
 
-            <div>
-                <p style={{display: "inline-block"}}>timeStarted:</p>
-                <input
-                    disabled={true}
-                    value={game.timeStarted}
-                />
-            </div>
-
-            <div>
-                <p style={{display: "inline-block"}}>TimeLockedDown:</p>
-                <input
-                    defaultValue={game.timeLockedDown}
-                />
-            </div>
-
-            <div>
-                <p style={{display: "inline-block"}}>timeEnded:</p>
-                <input
-                    defaultValue={game.timeEnded}
-                />
-            </div>
-
-            <div>
-                <p style={{display: "inline-block"}}>Quizes:</p>
-                {game.quizes.map((q, i) =>
-                    <button
-                        key={i}
-                        onClick={() => props.select({...props.selected, object: q, tab: "quiz"})}
-                    >
-                        {`${q.id}. ${q.name}`}
-                    </button>
-                )}
-            </div>
-
+            <button onClick={commit}>commit</button>
         </div>
     );
 };

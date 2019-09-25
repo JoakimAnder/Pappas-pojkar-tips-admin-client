@@ -1,60 +1,67 @@
-import React, { useState } from 'react';
-import {createMatch} from "../../Dao";
+import React, { useState, useContext } from 'react';
+import SearchableList from "../../SearchableList";
+import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import useDateTimeInput from "../../../hooks/useDateTimeInput";
+import InputDateField from "../../InputDateField";
+import {StateContext} from "../../Main";
+import {createMatch} from "../../actions";
 
 const NewMatch = props => {
-    const [match, setMatch] = useState({});
+    const {quizes, teams} = useContext(StateContext);
 
-    function onSubmit(e) {
-        e.preventDefault();
+    const [name, nameBond] = useInput();
+    const [, [dateBind, timeBind], stringDate] = useDateTimeInput(new Date());
+    const [pointsCode, pointsCodeBond] = useInput();
+    const [channel, channelBond] = useInput();
+    const [isTieable, setTie] = useState(true);
+    const [matchTeams, setTeams] = useState([null, null]);
+    const [quiz, setQuiz] = useState({});
 
-        createMatch(match, match => {
-            props.select({object: match, tab: "match", type:"edit"})
-        })
+    function onSubmit() {
+        const match = {
+            "date_time":stringDate(), name, quiz, pointsCode, channel, isTieable, teams: matchTeams
+        };
+
+        createMatch(match)
     }
+
+    const filteredTeams = teams.filter( t => !matchTeams.some( t2 => t2 && t.id === t2.id ) );
+
+    function customSearchableList(teamIndex, onClick) {
+        const team = matchTeams[teamIndex];
+        return <div>
+            <label>Team {teamIndex+1}:</label>
+            {team && <button onClick={() => onClick(null)}>{`${team.id}. ${team.name}`}</button>}
+            <SearchableList
+                label="change"
+                list={filteredTeams}
+                onClick={onClick}
+            />
+        </div>
+    }
+
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                defaultValue={match.team1}
-                onChange={e => setMatch({...match, team1: e.target.value})}
-                placeholder={"team1Id"}
-                type={"number"}
-            />
-            <input
-                defaultValue={match.team2}
-                onChange={e => setMatch({...match, team2: e.target.value})}
-                placeholder={"team2Id"}
-                type={"number"}
-            />
-            <input
-                value={match.channel}
-                onChange={e => setMatch({...match, channel: e.target.value})}
-                placeholder={"channel"}
-                type={"text"}
-            />
-            <input
-                defaultValue={match["date_time"]}
-                onChange={e => setMatch({...match, "date_time": e.target.value})}
-                placeholder={"dateTime"}
-                type={"number"}
-            />
-            <input
-                defaultValue={match.quiz}
-                onChange={e => setMatch({...match, quiz: e.target.value})}
-                placeholder={"quizId"}
-                type={"number"}
-            />
-            <label>isTieable</label><input
-                defaultChecked={match.isTieable}
-                onChange={e => setMatch({...match, isTiable: e.target.value})}
-                placeholder={"isTieable"}
-                type={"checkbox"}
-        />
-            <input
-                placeholder={"pointsCode"}
-                type={"text"}
-            />
-            <button type={"submit"} >Commit</button>
-        </form>
+        <div>
+            <InputField label={"Name"} bond={nameBond} />
+
+            {customSearchableList(0,q => setTeams([ q, matchTeams[1] ] ))}
+            {customSearchableList(1,t => setTeams([ matchTeams[0], t ] ))}
+
+            <InputField label={"Channel"} bond={channelBond} />
+            <InputDateField dateBond={dateBind} timeBond={timeBind} />
+
+            <SearchableList label="Quiz" list={quizes} onClick={q => setQuiz(q)} selected={quiz} />
+
+            <InputField label="Is Tieable" bond={{
+                defaultChecked: isTieable,
+                onChange: e => setTie(e.target.checked),
+                type: "checkbox"
+            }} />
+
+            <InputField label={"PointsCode"} bond={pointsCodeBond} />
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 
