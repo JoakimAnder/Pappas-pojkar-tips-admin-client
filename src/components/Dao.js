@@ -6,6 +6,8 @@ export function validateAdmin( password, onSuccess ) {
     onSuccess()
 }
 
+
+
 // region Get
 
 export function getAll( onSuccess=e=>e ) {
@@ -28,6 +30,7 @@ export function getGames( onSuccess=e=>e ) {
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
+
 
 export function getQuizes( onSuccess=e=>e ) {
     return axios.get(baseURL+"/getQuizes")
@@ -70,6 +73,7 @@ export function createMatch(match, isTieable, pointsCode, quizID, onSuccess=e=>e
         .catch(console.log)
 }
 
+
 export function createQuestion(question, quizID, onSuccess=e=>e) {
     return axios.post(baseURL+`/createQuestion?quizId=${quizID}`, question)
         .then(data => onSuccess(data.data))
@@ -77,7 +81,8 @@ export function createQuestion(question, quizID, onSuccess=e=>e) {
 }
 
 export function createQuiz(quiz, onSuccess=e=>e) {
-    return axios.post(baseURL+`/createQuiz?gameId=${quiz.game.id}`, {name: quiz.name})
+    console.log(quiz)
+    return axios.post(baseURL+`/createQuiz`, quiz)
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }
