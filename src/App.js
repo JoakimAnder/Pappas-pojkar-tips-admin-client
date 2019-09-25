@@ -4,7 +4,7 @@ import Login from "./components/Login";
 
 
 function App() {
-  const [page, setPage] = useState("main");
+  const [page, setPage] = useState("login");
   function parsePage() {
     switch (page) {
       case "main":
@@ -18,6 +18,9 @@ function App() {
     <div className="App">
       <header className="App-header">
       </header>
+      <div id="datafetch">
+
+      </div>
       {parsePage()}
     </div>
   );
