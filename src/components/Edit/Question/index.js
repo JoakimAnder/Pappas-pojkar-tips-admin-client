@@ -31,7 +31,7 @@ const EditQuestion = () => {
     return (
         <div>
             <InputField label={"ID"} value={id} />
-            <InputField label={"slogan"} bond={sloganBond} />
+            <InputField label={"slogan"} bond={sloganBond}   />
             <InputField label={"pointsCode"} bond={pointsCodeBond} />
             <InputField label={"answerType"} bond={answerTypeBond} />
 

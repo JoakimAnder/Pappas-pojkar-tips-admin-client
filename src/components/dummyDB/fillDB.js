@@ -92,7 +92,7 @@ const matches =[
 
 ]
 
-const teams = [
+const groupTeams = [
     {
         name: "Ryssland",
         flag:""
@@ -220,7 +220,9 @@ const teams = [
     {
         name: "Senegal",
         flag:""
-    },
+    }
+    ]
+const qhostTeams = [
     {
         name: "A1",
         flag: ""
@@ -470,6 +472,75 @@ return dao.createTeam(teamToBe)
         return data.id
     })
 }
+
+function createGroupStageTeam(teamIndex) {
+    let team ={
+     name: groupTeams[teamIndex].name,
+     flag : ""
+    }
+    return team
+}
+
+function createGroupStageMatch(matchNr,team1Index,team2Index) {
+    let match = {
+
+   name :"Match " +matchNr,
+   team1 : createGroupStageTeam(team1Index),
+   team2 : createGroupStageTeam(team2Index),
+   channel: "Tv4",
+   isTieable : true,
+   pointsCode : 1,
+   date : "2022-06-01T12:30"
+    }
+
+    return match
+
+  
+}
+
+ function createGroupStageQuiz(){
+
+     let name = "Group Stage"
+     let matches = []
+     let i = 1;
+     for(let groupNr = 0; groupNr < 8; groupNr++){
+         for (let team1Index = groupNr *4; team1Index < groupNr*4 +4 ; team1Index++) {
+             for (let team2Index = team1Index+1; team2Index <groupNr*4+4 ; team2Index++) {
+                 console.log(team1Index,team2Index)
+                 matches.push(createGroupStageMatch(i++,team1Index,team2Index))
+             }
+         }
+
+     }
+     let quiz = {
+         name, matches
+     }
+     return quiz
+ }
+
+ function createGhostQuiz() {
+
+ }
+
+ function createMyGame(){
+
+    return{
+         name: "VM 2022",
+             date: "2022-06-01T12:30",
+         quizes: [
+         createGroupStageQuiz()
+     ]
+     }
+ }
+
+const game22 = {
+    name: "VM 2022",
+    date: "2022-06-01T12:30",
+    quizes: [
+        createGroupStageQuiz(),
+        createGhostQuiz()
+    ]
+}
 const game2 = {
     name: "VM 2022",
     date: "2022-06-01T12:30",
@@ -548,5 +619,6 @@ const game2 = {
 }
 
 export function fillDB(){
-    createGame2(game2)
+     createGame2(createMyGame())
+   
 }

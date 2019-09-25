@@ -26,7 +26,7 @@ export default function SearchableList({label, list=[], selected, isSelected=def
             onClick={() => onClick(item, index)}
             className={(selected && isSelected(item, selected) ? "selected" : "")}
         >
-            {buttonLabel ? buttonLabel(item, index) : `${item.id}. ${item.name || item.slogan}`}
+            {buttonLabel ? buttonLabel(item, index) : `${item.id}. ${(item.name === undefined ? item.slogan : item.name)}`}
         </button>
     }
 

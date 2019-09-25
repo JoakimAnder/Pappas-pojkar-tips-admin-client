@@ -27,7 +27,8 @@ const EditQuiz = () => {
             <InputField label={"ID"} value={id} />
             <InputField label={"Name"} bond={nameBond} />
 
-            <InputListField
+            <SearchableList
+                searchable={false}
                 label="Questions"
                 list={questions}
                 onClick={q => setObject(q, "question")}

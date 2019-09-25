@@ -26,13 +26,13 @@ export default function TabbableList() {
             }}
         />
 
-        <button onClick={() => setOperation("new")} >New</button>
+        <button onClick={() => setOperation("new")} className={(state.selectedOperation ==="new" ? "selected": "")}>New</button>
 
         <SearchableList
             list={state[tabs[selectedTab]]}
             onClick={item => setObject(item, selectedTab)}
-            selected={selectedTab}
-            isSelected={(item, selected) => item === selected}
+            selected={state.selectedObject}
+            isSelected={(item, selected) => item.id === selected.id}
         />
     </div>
 }

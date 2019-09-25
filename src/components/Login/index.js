@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
 import { validateAdmin } from "../Dao";
 import {fillDB} from "../dummyDB/fillDB";
@@ -8,6 +8,9 @@ export default function Login(props) {
 
 
     return <div>
+
+
+
         <p>Password:</p>
         <input onChange={e => setPassword(e.target.value)} value={password} placeholder={"password"} type={"password"} />
         <button onClick={() => validateAdmin(password, () => props.setPage("main"))}>Login</button>

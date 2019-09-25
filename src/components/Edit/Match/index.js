@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {StateContext} from "../../Main";
 import useInput from "../../../hooks/useInput";
 import useDateTimeInput from "../../../hooks/useDateTimeInput";
@@ -17,6 +17,9 @@ const EditMatch = () => {
     const [, [dateBond, timeBond], stringDate] = useDateTimeInput(selectedObject["date_time"]);
     const question = selectedObject.question;
     const [matchTeams, setTeams] = useState(selectedObject.teams);
+    useEffect(()=>{
+        setTeams(selectedObject.teams)
+    },[selectedObject])
 
 
 
@@ -51,7 +54,8 @@ const EditMatch = () => {
 
             <InputDateField dateBond={dateBond} timeBond={timeBond} />
 
-            <InputListField
+            <SearchableList
+                searchable={false}
                 label="Question"
                 list={[question]}
                 onClick={q => setObject(q, "question")}

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, {useState, useContext, useEffect} from "react";
 import NewGame from "../New/Game";
 import NewQuiz from "../New/Quiz";
 import NewQuestion from "../New/Question";
@@ -12,9 +12,13 @@ import EditTeam from "../Edit/Team";
 import { StateContext } from "../Main";
 
 export default function MyForm() {
-    const { selectedOperation, selectedTab } = useContext(StateContext);
+    const { selectedOperation, selectedTab, selectedObject } = useContext(StateContext);
+    const [form, setForm] = useState(parseForm());
+    useEffect(()=>{
+        setForm(parseForm())
+    },[selectedObject])
 
-    function parseForm() {
+    function parseForm  ()  {
         switch( selectedOperation ) {
             case "new":
                 switch( selectedTab ) {
@@ -41,6 +45,6 @@ export default function MyForm() {
         }
     }
     return <>
-        {parseForm()}
+        {form}
     </>
 }
