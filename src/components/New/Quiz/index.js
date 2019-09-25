@@ -1,31 +1,36 @@
-import React, { useState } from 'react';
-import {createQuiz} from "../../Dao";
+import React, { useState, useContext } from 'react';
+import SearchableList from "../../SearchableList";
+import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import {StateContext} from "../../Main";
+import {createQuiz} from "../../actions";
 
-const NewQuiz = props => {
-    const [quiz, setQuiz] = useState({});
-    function onSubmit(e) {
-        e.preventDefault();
+const NewQuiz = () => {
+    const {games} = useContext(StateContext);
 
-        createQuiz(quiz, quiz => {
-            props.select({object: quiz, type: "edit", tab: "quiz"})
-        })
+    const [name, nameBond] = useInput();
+    const [game, setGame] = useState({});
+
+    function onSubmit() {
+        const quiz = {
+            name, game
+        };
+
+        createQuiz(quiz)
     }
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                value={quiz.name}
-                placeholder={"name"}
-                type={"text"}
-                onChange={e => setQuiz({...quiz, name: e.target.value})}
+        <div>
+            <InputField label={"Name"} bond={nameBond} />
+
+            <SearchableList
+                label={"Game"}
+                list={games}
+                selected={game}
+                onClick={g => setGame(g)}
             />
-            <input
-                value={quiz.game}
-                placeholder={"gameid"}
-                type={"number"}
-                onChange={e => setQuiz({...quiz, game: e.target.value})}
-            />
-            <button type={"submit"} >Commit</button>
-        </form>
+
+            <button onClick={onSubmit}>Commit</button>
+        </div>
     );
 };
 

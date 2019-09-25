@@ -1,38 +1,44 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
+import {StateContext} from "../../Main";
+import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import SearchableList from "../../SearchableList";
+import InputListField from "../../InputListField";
+import {editQuiz, setObject} from "../../actions";
 
-const EditQuiz = props => {
-    const quiz = props.selected.object;
+const EditQuiz = () => {
+    const {selectedObject, games} = useContext(StateContext);
+
+    const id = selectedObject.id;
+    const questions = selectedObject.questions;
+    const [name, nameBond] = useInput(selectedObject.name);
+    const [game, setGame] = useState(selectedObject.game);
+
+
+    function commit() {
+        const newQuiz = {
+            id, name, game
+        }
+        editQuiz(newQuiz)
+    }
+
     return (
         <div>
+            <InputField label={"ID"} value={id} />
+            <InputField label={"Name"} bond={nameBond} />
 
-            <div>
-                <p style={{display: "inline-block"}}>ID:</p>
-                <input
-                    value={quiz.id}
-                />
-            </div>
-
-            <div>
-                <p style={{display: "inline-block"}}>name:</p>
-                <input
-                    value={quiz.name}
-                />
-            </div>
-
-            <div>
-                <p style={{display: "inline-block"}}>questions:</p>
-                {quiz.questions.map((q,i) =>
-                    <button key={i} onClick={() => props.select({...props.selected, tab: "question", object: q})}>
-                        {`${q.id}. ${q.slogan}`}
-                    </button>)}
-            </div>
-
-            <div>
-                <p style={{display: "inline-block"}}>game:</p>
-                <button onClick={() => props.select({...props.selected, tab: "game", object: quiz.game})}>
-                    {`${quiz.game.id}. ${quiz.game.name}`}
-                </button>
-            </div>
+            <InputListField
+                label="Questions"
+                list={questions}
+                onClick={q => setObject(q, "question")}
+            />
+            <SearchableList
+                label="Game"
+                list={games}
+                selected={game}
+                onClick={g => g.id === game.id ? setObject(g, "game") : setGame(g)}
+            />
+            <button onClick={commit}>commit</button>
 
         </div>
     );

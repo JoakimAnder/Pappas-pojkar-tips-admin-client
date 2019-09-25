@@ -1,70 +1,36 @@
-import React, { useState } from "react";
+import React, { useReducer, useEffect } from "react";
 import MyForm from "../MyForm"
 import TabbableList from "../TabbableList"
+import {reducer} from "../Reducers";
+import * as actions from "../actions";
 
-
-const team1 = {
-    id: 1,
-    name: "Sweden",
-    flag: "sFlag"
-
-};
-const team2 = {
-    id: 2,
-    name: "Norway",
-    flag: "nFlag"
-};
-const question = {
-    id: 1,
-    slogan: "Sweden vs Norway",
-    pointsCode: "5R5,1W-1",
-    answerType: "5",
-    quiz: null,
-    alternatives: ["1","x","2"],
-    results: []
-};
-const match = {
-    id: 1,
-    name: "Match 29",
-    channel: "tv4",
-    "date_time": 123654,
-    question: question,
-    teams: [team1, team2]
-};
-const game = {
-    id: 1,
-    name: "VM 2022",
-    timeStarted: 0,
-    timeLockedDown: 1,
-    timeEnded: 2,
-    quizes: []
-};
-const quiz = {
-    id: 1,
-    name: "ghostQuiz",
-    questions: [question],
-    game: game
-};
-question.quiz = quiz;
-game.quizes.push(quiz);
-
+export const StateContext = React.createContext();
 
 export default function Main() {
-    const [selected, select] = useState({
-        type: "new",
-        tab: "question",
-        object: null
-    })
+    const [state, dispatch] = useReducer(reducer, {
+        selectedOperation: "new",
+        selectedTab: "game",
+        selectedObject: null,
+        games: [],
+        quizes: [],
+        matches: [],
+        questions: [],
+        teams: [],
+        tasks: [],
+        isLoading: false
+    });
+
+   actions.setDispatch(dispatch);
+
+    useEffect(() => {
+        actions.getAll()
+    }, []);
 
     return <div>
-        <TabbableList
-            selected={selected}
-            select={s => select({...selected, ...s})}
-        />
-        <hr/>
-        <MyForm
-            selected={selected}
-            select={s => select({...selected, ...s})}
-        />
+        <StateContext.Provider value={state}>
+            <TabbableList />
+            <hr/>
+            <MyForm />
+        </StateContext.Provider>
     </div>
 }

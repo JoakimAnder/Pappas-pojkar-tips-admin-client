@@ -1,55 +1,53 @@
-import React, { useState } from 'react';
-import {createQuestion} from "../../Dao";
+import React, { useState, useContext } from 'react';
+import useInput from "../../../hooks/useInput";
+import InputField from "../../InputField";
+import SearchableList from "../../SearchableList";
+import InputAddableList from "../../InputAddableList";
+import {StateContext} from "../../Main";
+import {createQuestion} from "../../actions";
 
-const NewQuestion = props => {
-    const [question, setQuestion] = useState({alternatives:[]});
-    function onSubmit(e) {
-        e.preventDefault();
+const NewQuestion = () => {
+    const {quizes} = useContext(StateContext);
 
-        createQuestion(question, question => {
-            props.select({
-                object: question,
-                type: "edit",
-                tab: "question"})
-        })
-    }
-    function addAlt(){
-        let input = document.getElementById("addAltInput");
-        setQuestion({...question, alternatives: [...question.alternatives, input.value]})
-        input.value = "";
+    const [slogan, sloganBond] = useInput();
+    const [alternatives, setAlts] = useState([]);
+    const [results, setResults] = useState([]);
+    const [quiz, setQuiz] = useState({});
+    const [pointsCode, pointsCodeBond] = useInput();
+    const [answerType, answerTypeBond] = useInput();
+
+    function onSubmit() {
+        const question = {
+            results,
+            quiz,
+            slogan,
+            pointsCode,
+            answerType,
+            alternatives
+        };
+
+        createQuestion(question)
     }
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                value={question.slogan}
-                onChange={e => setQuestion({...question, slogan: e.target.value})}
-                placeholder={"slogan"}
-                type={"text"} />
-            {question.alternatives && question.alternatives.map((a,i) =>
-                <div key={i}>
-                    {a}
-                    <button onClick={() => setQuestion({...question, alternatives: question.alternatives.filter((_, i1) => i !== i1)})}>
-                        X
-                    </button>
-                </div>
-            )}
-            <input
-                id={"addAltInput"}
-                placeholder={"Add alternative"}
+        <div>
+            <InputField label={"Slogan"} bond={sloganBond} />
+
+            <InputAddableList list={alternatives} setList={setAlts} placeholder="Add Alternative" label="Alternatives" />
+            <InputAddableList list={results} setList={setResults} placeholder="Add Result" label="Results" />
+
+            <SearchableList
+                label={"Quiz"}
+                list={quizes}
+                onClick={q => setQuiz(q)}
+                selected={quiz}
             />
-            <button onClick={addAlt}>+</button>
-            <input
-                value={question.pointsCode}
-                placeholder={"pointsCode"}
-                onChange={e => setQuestion({...question, pointsCode: e.target.value})}
-                type={"text"} />
-            <input
-                value={question.answerType}
-                placeholder={"answerType"}
-                onChange={e => setQuestion({...question, answerType: e.target.value})}
-                type={"text"} />
-            <button type={"submit"} >Commit</button>
-        </form>
+
+            <InputField label={"PointsCode"} bond={pointsCodeBond} />
+            <InputField label={"AnswerType"} bond={answerTypeBond} />
+
+            <button onClick={onSubmit}>Commit</button>
+
+        </div>
     );
 };
 
