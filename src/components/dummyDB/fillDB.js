@@ -412,8 +412,11 @@ async function createGame2(game) {
 function createQuiz2(quiz, gameId) {
     let quizToBe = {
         name: quiz.name,
+        game: {
+            id: gameId
+        }
     }
-    dao.createQuiz(quiz,gameId)
+    dao.createQuiz(quiz)
         .then(data => {
             quizToBe = data
         }).then(()=>{
@@ -432,21 +435,27 @@ async function createMatch2(match, quizId) {
 
     let matchToBe = {
         channel: match.channel,
-        date_time: match.date
+        date_time: match.date,
+        teams: [
+            {
+             id: ""
+            },
+            {
+                id: ""
+            }
+        ]
     }
-    let team1ID
-    let team2ID
 
    await createTeam2(team1)
         .then(data =>{
-            team1ID = data;
+            matchToBe.teams[0].id = data;
         })
    await createTeam2(team2)
         .then(data => {
-            team2ID = data
+            matchToBe.teams[1].id = data
         })
 
-   await dao.createMatch(matchToBe, team1ID, team2ID, isTieable, pointsCode,quizId)
+   await dao.createMatch(matchToBe, isTieable, pointsCode,quizId)
        .then(()=>console.log("DONE!!"))
 }
 
