@@ -81,7 +81,8 @@ export function createQuestion(question, quizID, onSuccess=e=>e) {
 }
 
 export function createQuiz(quiz, onSuccess=e=>e) {
-    return axios.post(baseURL+`/createQuiz?gameId=${quiz.game.id}`, {name: quiz.name})
+    console.log(quiz)
+    return axios.post(baseURL+`/createQuiz`, quiz)
         .then(data => onSuccess(data.data))
         .catch(console.log)
 }

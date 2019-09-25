@@ -416,7 +416,7 @@ function createQuiz2(quiz, gameId) {
             id: gameId
         }
     }
-    dao.createQuiz(quiz)
+    dao.createQuiz(quizToBe)
         .then(data => {
             quizToBe = data
         }).then(()=>{
@@ -436,6 +436,7 @@ async function createMatch2(match, quizId) {
     let matchToBe = {
         channel: match.channel,
         date_time: match.date,
+        name: match.name,
         teams: [
             {
              id: ""
@@ -471,12 +472,13 @@ return dao.createTeam(teamToBe)
 }
 const game2 = {
     name: "VM 2022",
-    date: 232334,
+    date: "2022-06-01T12:30",
     quizes: [
         {
             name: "Group Stage",
             matches: [
                 {
+                    name: "Match 1",
                     team1: {
                         name:"Sweden",
                         flag: ""
@@ -488,9 +490,10 @@ const game2 = {
                     channel: "tv4",
                     isTieable: true,
                     pointsCode: 1,
-                    date: 1233454
+                    date: "2022-06-01T12:30"
                 },
                 {
+                    name: "Match 2",
                     team1: {
                         name:"Brazil",
                         flag: ""
@@ -502,7 +505,7 @@ const game2 = {
                     channel: "tv4",
                     isTieable: true,
                     pointsCode: 1,
-                    date: 1233454
+                    date: "2022-06-01T12:30"
                 }
             ]
         },
@@ -510,6 +513,7 @@ const game2 = {
             name: "Ghost Quiz",
             matches: [
                 {
+                    name: "Match 3",
                     team1: {
                         name:"A1",
                         flag: ""
@@ -521,9 +525,10 @@ const game2 = {
                     channel: "tv4",
                     isTieable: false,
                     pointsCode: 1,
-                    date: 1233454
+                    date: "2022-06-01T12:30"
                 },
                 {
+                    name: "Match 4",
                     team1: {
                         name:"C1",
                         flag: ""
@@ -535,7 +540,7 @@ const game2 = {
                     channel: "tv4",
                     isTieable: false,
                     pointsCode: 1,
-                    date: 1233454
+                    date: "2022-06-01T12:30"
                 }
             ]
         }
